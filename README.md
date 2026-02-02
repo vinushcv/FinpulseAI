@@ -124,7 +124,6 @@ finpulse/
 
 ## 🔮 Future Roadmap
 - [ ] **History Tab:** View past analysis reports.
-- [ ] **PDF Export:** Download full financial health reports.
 - [ ] **Multi-User Support:** Auth0/Clerk integration for teams.
 
 ---
