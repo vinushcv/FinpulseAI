@@ -1,0 +1,14 @@
+Date,Category,Amount,Type
+2024-03-01,Store Rent,3500.00,Expense
+2024-03-02,Inventory Purchase,5000.00,Expense
+2024-03-03,Daily Sales,200.00,Income
+2024-03-04,Daily Sales,150.00,Income
+2024-03-05,Utilities,450.00,Expense
+2024-03-06,Daily Sales,300.00,Income
+2024-03-10,Loan Repayment,1200.00,Expense
+2024-03-12,Daily Sales,100.00,Income
+2024-03-15,Staff Wages,2500.00,Expense
+2024-03-18,Emergency Repairs,800.00,Expense
+2024-03-20,Daily Sales,400.00,Income
+2024-03-25,Marketing Flyers,300.00,Expense
+2024-03-30,Daily Sales,250.00,Income
