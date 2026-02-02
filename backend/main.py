@@ -34,9 +34,15 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="FinPulse API", description="SME Financial Health Assessment Platform")
 
 # CORS Setup
+origins = [
+    "http://localhost:5173",
+    "https://finpulseai-three.vercel.app", # Your documented live URL
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all for Hackathon demo (Vercel -> Render)
+    allow_origins=origins, # Specific origins allow credentials
+    # allow_origin_regex="https://.*\.vercel\.app", # Optional: Allow any Vercel deployment
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
