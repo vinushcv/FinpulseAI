@@ -55,6 +55,15 @@ def get_db():
 def read_root():
     return {"message": "Welcome to FinPulse API"}
 
+@app.get("/health")
+def health_check(db: Session = Depends(get_db)):
+    try:
+        # Try to execute a simple query
+        db.execute(text("SELECT 1"))
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
+
 @app.post("/upload/{company_id}")
 async def upload_financial_statement(company_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
     # 1. Save File
