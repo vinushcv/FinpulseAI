@@ -66,8 +66,10 @@ export function UploadZone({ companyId, onUploadSuccess }) {
         <div className="w-full max-w-md mx-auto">
             <div
                 className={cn(
-                    "relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
-                    isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+                    "relative flex flex-col items-center justify-center w-full h-64 border-dashed rounded-lg cursor-pointer transition-colors border-2",
+                    isDragging
+                        ? "border-blue-500 bg-blue-500/10"
+                        : "border-border bg-muted/5 hover:bg-muted/10"
                 )}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -85,14 +87,14 @@ export function UploadZone({ companyId, onUploadSuccess }) {
                     {file ? (
                         <>
                             <FileText className="w-10 h-10 mb-3 text-green-500" />
-                            <p className="mb-2 text-sm text-gray-500 font-semibold">{file.name}</p>
-                            <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(2)} KB</p>
+                            <p className="mb-2 text-sm text-foreground font-semibold">{file.name}</p>
+                            <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(2)} KB</p>
                         </>
                     ) : (
                         <>
-                            <Upload className="w-10 h-10 mb-3 text-gray-400" />
-                            <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                            <p className="text-xs text-gray-500">CSV, Excel (MAX. 10MB)</p>
+                            <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
+                            <p className="mb-2 text-sm text-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                            <p className="text-xs text-muted-foreground">CSV, Excel (MAX. 10MB)</p>
                         </>
                     )}
                 </div>
@@ -106,7 +108,7 @@ export function UploadZone({ companyId, onUploadSuccess }) {
 
             {file && (
                 <Button
-                    className="w-full mt-4"
+                    className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                     onClick={handleUpload}
                     disabled={uploading}
                 >

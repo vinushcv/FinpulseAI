@@ -6,14 +6,71 @@ import { ScenarioSimulator } from './ScenarioSimulator'; // Import new component
 import { cn } from '@/lib/utils';
 import { UploadZone } from './UploadZone';
 import { api } from '@/services/api';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Activity, TrendingUp, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { Activity, TrendingUp, AlertTriangle, ShieldCheck, LayoutDashboard, Info, Sun, Moon, ChevronDown, ChevronUp } from 'lucide-react';
+
+function CollapsibleRecommendations({ recommendations }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const recs = (() => {
+        try {
+            const parsed = typeof recommendations === 'string'
+                ? JSON.parse(recommendations)
+                : recommendations;
+            return Array.isArray(parsed) ? parsed : [parsed];
+        } catch (e) {
+            return [String(recommendations)];
+        }
+    })();
+
+    return (
+        <div className="mt-6 border border-slate-700 rounded-lg overflow-hidden transition-all duration-300">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between p-4 bg-slate-800/50 hover:bg-slate-800 transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-yellow-500" />
+                    <span className="font-semibold text-yellow-500">View Strategic Recommendations</span>
+                    <span className="text-xs text-slate-400 bg-slate-900 px-2 py-0.5 rounded-full border border-slate-700">
+                        {recs.length} Items
+                    </span>
+                </div>
+                {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+            </button>
+
+            {isOpen && (
+                <div className="bg-slate-900/50 p-4 border-t border-slate-700 animate-in slide-in-from-top-2">
+                    <ul className="space-y-3">
+                        {recs.map((r, i) => (
+                            <li key={i} className="flex gap-3 text-sm text-slate-300 leading-relaxed">
+                                <span className="text-blue-500 font-mono mt-0.5">0{i + 1}.</span>
+                                {r}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+        </div>
+    );
+}
+
 
 export default function Dashboard() {
+    const [theme, setTheme] = useState('dark'); // Default to dark
     const [activeCompany, setActiveCompany] = useState(null);
     const [metrics, setMetrics] = useState(null);
     const [assessment, setAssessment] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    // Theme Effect
+    useEffect(() => {
+        const root = window.document.documentElement;
+        root.classList.remove('light', 'dark');
+        root.classList.add(theme);
+    }, [theme]);
+
+    const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
     // Auto-create a test company for Hackathon Demo Flow
     useEffect(() => {
@@ -40,25 +97,41 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
             {/* Header */}
-            <header className="bg-white border-b px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+            {/* Header */}
+            <header className="bg-background border-b border-border px-8 py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-2">
-                    <Activity className="text-blue-600 w-6 h-6" />
-                    <h1 className="text-xl font-bold text-gray-900">FinPulse</h1>
+                    <Activity className="text-blue-500 w-6 h-6" />
+                    <h1 className="text-xl font-bold text-foreground">FinPulse</h1>
                 </div>
                 <div className="flex items-center gap-4">
-                    <span className="text-sm text-gray-500">Demo User</span>
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">D</div>
+                    <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
+                        {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                    </Button>
+                    <span className="text-sm text-muted-foreground">Demo User</span>
+                    <div className="w-8 h-8 bg-blue-500/20 text-blue-500 rounded-full flex items-center justify-center font-bold">D</div>
                 </div>
             </header>
 
             <main className="flex-1 p-8 max-w-7xl mx-auto w-full">
-                <Tabs defaultValue="overview">
-                    <div className="flex justify-between items-center mb-6">
-                        <TabsList>
-                            <TabsTrigger value="overview">Overview</TabsTrigger>
-                            <TabsTrigger value="simulator">Future Simulator (Beta)</TabsTrigger>
+                <Tabs defaultValue="overview" className="space-y-6">
+                    <div className="flex justify-center mb-8">
+                        <TabsList className="grid w-[400px] grid-cols-2 p-1 bg-muted/50 rounded-full">
+                            <TabsTrigger
+                                value="overview"
+                                className="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all duration-300 flex items-center justify-center gap-2"
+                            >
+                                <LayoutDashboard className="w-4 h-4" />
+                                Overview
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="simulator"
+                                className="rounded-full data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-300 flex items-center justify-center gap-2"
+                            >
+                                <TrendingUp className="w-4 h-4" />
+                                Simulator
+                            </TabsTrigger>
                         </TabsList>
                     </div>
 
@@ -101,27 +174,27 @@ export default function Dashboard() {
 
                                 {/* KPI Cards */}
                                 <div className="grid grid-cols-3 gap-4">
-                                    <Card className="bg-white border-l-4 border-l-blue-500">
+                                    <Card className="bg-blue-500/10 border-blue-500/20">
                                         <CardContent className="pt-6">
-                                            <p className="text-sm text-gray-500">Revenue</p>
-                                            <p className="text-2xl font-bold text-gray-900">
-                                                {metrics ? `$${metrics.revenue.toLocaleString()}` : "—"}
+                                            <p className="text-sm font-medium text-blue-400">Revenue</p>
+                                            <p className="text-2xl font-bold text-foreground mt-2">
+                                                {metrics ? `$${metrics.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
                                             </p>
                                         </CardContent>
                                     </Card>
-                                    <Card className="bg-white border-l-4 border-l-red-500">
+                                    <Card className="bg-red-500/10 border-red-500/20">
                                         <CardContent className="pt-6">
-                                            <p className="text-sm text-gray-500">Expenses</p>
-                                            <p className="text-2xl font-bold text-gray-900">
-                                                {metrics ? `$${metrics.expenses.toLocaleString()}` : "—"}
+                                            <p className="text-sm font-medium text-red-400">Expenses</p>
+                                            <p className="text-2xl font-bold text-foreground mt-2">
+                                                {metrics ? `$${metrics.expenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
                                             </p>
                                         </CardContent>
                                     </Card>
-                                    <Card className={cn("bg-white border-l-4", (metrics?.net_profit || 0) >= 0 ? "border-l-green-500" : "border-l-orange-500")}>
+                                    <Card className={cn("bg-green-500/10 border-green-500/20")}>
                                         <CardContent className="pt-6">
-                                            <p className="text-sm text-gray-500">Net Profit</p>
-                                            <p className={cn("text-2xl font-bold", (metrics?.net_profit || 0) >= 0 ? "text-green-600" : "text-red-600")}>
-                                                {metrics ? `$${metrics.net_profit.toLocaleString()}` : "—"}
+                                            <p className="text-sm font-medium text-green-400">Net Profit</p>
+                                            <p className={cn("text-2xl font-bold mt-2", (metrics?.net_profit || 0) >= 0 ? "text-green-500" : "text-red-500")}>
+                                                {metrics ? `$${metrics.net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"}
                                             </p>
                                         </CardContent>
                                     </Card>
@@ -139,22 +212,36 @@ export default function Dashboard() {
                                             </CardHeader>
                                             <CardContent className="h-64">
                                                 <ResponsiveContainer width="100%" height="100%">
-                                                    <BarChart data={[
+                                                    <AreaChart data={[
                                                         { name: 'Revenue', amount: metrics.revenue },
                                                         { name: 'Expenses', amount: metrics.expenses },
                                                         { name: 'Profit', amount: metrics.net_profit }
                                                     ]}>
-                                                        <XAxis dataKey="name" />
-                                                        <YAxis />
-                                                        <Tooltip />
-                                                        <Bar dataKey="amount" fill="#3b82f6">
-                                                            {
-                                                                [0, 1, 2].map((entry, index) => (
-                                                                    <Cell key={`cell-${index}`} fill={index === 1 ? '#ef4444' : index === 2 ? '#22c55e' : '#3b82f6'} />
-                                                                ))
-                                                            }
-                                                        </Bar>
-                                                    </BarChart>
+                                                        <defs>
+                                                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                                            </linearGradient>
+                                                            <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8} />
+                                                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                                        <XAxis dataKey="name" axisLine={false} tickLine={false} stroke="#94a3b8" />
+                                                        <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value / 1000}k`} stroke="#94a3b8" />
+                                                        <Tooltip
+                                                            contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#fff' }}
+                                                            formatter={(value) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Amount']}
+                                                        />
+                                                        <Area
+                                                            type="monotone"
+                                                            dataKey="amount"
+                                                            stroke="#3b82f6"
+                                                            fillOpacity={1}
+                                                            fill="url(#colorRevenue)"
+                                                        />
+                                                    </AreaChart>
                                                 </ResponsiveContainer>
                                             </CardContent>
                                         </Card>
@@ -182,21 +269,7 @@ export default function Dashboard() {
                                                             </p>
 
                                                             {assessment.recommendations && (
-                                                                <div className="mt-4">
-                                                                    <strong className="text-yellow-500 block mb-2">Recommendations:</strong>
-                                                                    <ul className="list-disc pl-5 space-y-1 text-slate-400 text-sm">
-                                                                        {(() => {
-                                                                            try {
-                                                                                const recs = typeof assessment.recommendations === 'string'
-                                                                                    ? JSON.parse(assessment.recommendations)
-                                                                                    : assessment.recommendations;
-                                                                                return Array.isArray(recs) ? recs.map((r, i) => <li key={i}>{r}</li>) : <li>{recs}</li>;
-                                                                            } catch (e) {
-                                                                                return <li>{String(assessment.recommendations)}</li>
-                                                                            }
-                                                                        })()}
-                                                                    </ul>
-                                                                </div>
+                                                                <CollapsibleRecommendations recommendations={assessment.recommendations} />
                                                             )}
                                                         </div>
                                                     </div>
@@ -205,7 +278,7 @@ export default function Dashboard() {
                                         )}
                                     </>
                                 ) : (
-                                    <div className="h-96 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed rounded-xl bg-gray-50/50">
+                                    <div className="h-96 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl bg-muted/10 border-border">
                                         <Activity className="w-12 h-12 mb-4 opacity-50" />
                                         <p>Upload data to visualize insights</p>
                                     </div>

@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Wand2, RefreshCcw, FileDown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts';
+import { Wand2, RefreshCcw, FileDown, Info } from 'lucide-react';
 import { api } from '@/services/api';
 import { generateStrategyPDF } from '@/lib/pdf-generator';
 
@@ -104,8 +104,16 @@ export function ScenarioSimulator({ baseMetrics, companyInfo }) {
                 </CardHeader>
                 <CardContent className="space-y-8">
                     <div className="space-y-4">
-                        <div className="flex justify-between">
-                            <label className="font-medium text-sm">Revenue Growth Target</label>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <label className="font-medium text-sm">Revenue Growth Target</label>
+                                <div className="group relative">
+                                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg z-50">
+                                        Adjust this to simulate increased sales, new market entry, or pricing changes.
+                                    </div>
+                                </div>
+                            </div>
                             <span className="font-bold text-blue-600">{(modifiers.revenue_growth * 100).toFixed(0)}%</span>
                         </div>
                         <Slider
@@ -117,8 +125,16 @@ export function ScenarioSimulator({ baseMetrics, companyInfo }) {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="flex justify-between">
-                            <label className="font-medium text-sm">OpEx Adjustment</label>
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <label className="font-medium text-sm">OpEx Adjustment</label>
+                                <div className="group relative">
+                                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg z-50">
+                                        Simulate cost-cutting measures (negative) or new operational investments/hiring (positive).
+                                    </div>
+                                </div>
+                            </div>
                             <span className="font-bold text-red-600">{(modifiers.expense_change * 100).toFixed(0)}%</span>
                         </div>
                         <Slider
@@ -143,12 +159,17 @@ export function ScenarioSimulator({ baseMetrics, companyInfo }) {
                     <CardContent className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData}>
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value / 1000}k`} />
+                                <Tooltip
+                                    cursor={{ fill: '#f1f5f9' }}
+                                    contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#fff' }}
+                                    formatter={(value) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Amount']}
+                                />
                                 <Legend />
-                                <Bar dataKey="Actual" fill="#94a3b8" />
-                                <Bar dataKey="Projected" fill="#3b82f6" />
+                                <Bar dataKey="Actual" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="Projected" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
