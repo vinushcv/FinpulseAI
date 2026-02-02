@@ -51,7 +51,7 @@ Follow these instructions to run FinPulse locally.
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/finpulse.git
+git clone https://github.com/vinushcv/finpulse.git
 cd finpulse
 ```
 
