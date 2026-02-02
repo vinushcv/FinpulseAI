@@ -127,5 +127,3 @@ finpulse/
 - [ ] **Multi-User Support:** Auth0/Clerk integration for teams.
 
 ---
-
-Made with 💙 for the Hackathon.
